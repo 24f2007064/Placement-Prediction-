@@ -57,6 +57,22 @@ def explain_student(student_df, feature_list, model):
 
     return pd.Series(contribs, index=feature_list).sort_values()
 
+PRESCRIPTIONS = {
+    "internals_avg": "Internal assessment scores are dragging your placement chances down. Focus on quizzes/assignments — internals are the single strongest predictor in the model.",
+    "sgpa_trend": "Your SGPA trend is negative — grades are declining semester over semester. Stabilizing (even without a big jump) matters more than one great semester.",
+    "current_sgpa": "Your most recent semester's SGPA is a weak point relative to your history.",
+    "dip_count": "You've had several dip semesters (dropping below your rolling average). Consistency matters — avoid volatility even if the average looks fine.",
+    "consistency_score": "Your SGPA is volatile across semesters. Predictability helps more than occasional high peaks.",
+    "attendance_mean": "Attendance is below where it needs to be — this correlates with the other risk factors even if it's not the top driver.",
+    "last_sem_dip": "Your most recent semester was itself a dip — this is a recency-weighted red flag."
+}
+
+# NEW: Add the advice generator
+def generate_advice(contribs, top_n=2):
+    negative_contribs = contribs[contribs < 0].sort_values()
+    top_issues = negative_contribs.head(top_n).index.tolist()
+    return [PRESCRIPTIONS[f] for f in top_issues if f in PRESCRIPTIONS]
+
 # 4. Streamlit UI
 st.set_page_config(page_title="Placement Predictor", layout="wide")
 st.title("🎓 Student Placement Readiness Predictor")
