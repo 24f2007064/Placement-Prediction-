@@ -124,11 +124,20 @@ if st.button("Predict Readiness", type="primary"):
             st.dataframe(input_df.T, use_container_width=True)
             
     with col2:
-        st.subheader("What drove this prediction?")
-        st.caption("Positive values push the model toward 'Ready', negative push toward 'Not Ready'.")
-        
-        # Get SHAP values using your function
-        contribs = explain_student(edited_df, FEATURES_TRIMMED, model)
-        
-        # Display as a bar chart natively in Streamlit
-        st.bar_chart(contribs, horizontal=True)
+            st.subheader("What drove this prediction?")
+            st.caption("Positive values push the model toward 'Ready', negative push toward 'Not Ready'.")
+            
+            # Get SHAP values using your function
+            contribs = explain_student(edited_df, FEATURES_TRIMMED, model)
+            
+            # Display as a bar chart natively in Streamlit
+            st.bar_chart(contribs, horizontal=True)
+            
+            # NEW: Generate and display the advice
+            advice_list = generate_advice(contribs)
+            
+            if advice_list:
+                st.subheader("💡 Actionable Feedback")
+                for advice in advice_list:
+                    # Using st.warning makes it stand out visually as an area for improvement
+                    st.warning(advice)
